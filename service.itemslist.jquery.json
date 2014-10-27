@@ -1,0 +1,18 @@
+{
+	"name": "service.itemslist",
+	"version": "1.0.0",
+	"title": "jQuery itemslist component",
+	"description": "A jQuery plugin that shows a list 'view( (full or page by page). List items are retrieved and HTML formatted server side using AJAX.",
+	"homepage": "http://code.cwwonline.be",
+	"author": {
+		"name": "Jos Huybrighs",
+		"url": "http://code.cwwonline.be"
+	},
+	"licenses": [{
+		"type": "MIT",
+		"url": "http://opensource.org/licenses/MIT"
+	}],
+	"dependencies": {
+		"jquery": ">=1.8.0"
+	}
+}
