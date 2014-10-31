@@ -98,26 +98,32 @@
                 success: function (data) {
                     // Show items
                     self.element.html(data);
-                    // Reinit paginator (if told to do so)
-                    if (initPaginator) {
+                    if (self.settings.usePaginator) {
                         // Save total number of items (across all pages)
                         self.settings.totalItemsCount = $(self.settings.totalNrOfItemsElement).val();
-                        var activePageIdx = skipCount / maxItems;
-                        self.settings.onInitPaginator(self.settings.totalItemsCount, activePageIdx);
+                        // Reinit paginator (if told to do so)
+                        if (initPaginator) {
+                            var activePageIdx = skipCount / maxItems;
+                            self.settings.onInitPaginator(self.settings.totalItemsCount, activePageIdx);
+                        }
+                        listParms.totalItemsCount = self.settings.totalItemsCount;
                     }
                     // Inform client that a new set of items has been loaded and presented
-                    listParms.totalItemsCount = self.settings.totalItemsCount;
                     self.settings.onEndLoadItems(false, listParms, null);
-                    // Check if there were actually items returned
-                    var returnedItemsCount = $(self.settings.displNrOfItemsElement).val();
-                    if (returnedItemsCount == 0 &&
-                        skipCount != 0           ) {
-                        // No - Load preceeding page (if any)
-                        self._getPageOfItems(skipCount - maxItems, maxItems, filters, sortCriterium, true);
+                    if (self.settings.usePaginator) {
+                        // Check if there were actually items returned
+                        var returnedItemsCount = $(self.settings.displNrOfItemsElement).val();
+                        if (returnedItemsCount == 0 &&
+                            skipCount != 0) {
+                            // No - Load preceeding page (if any)
+                            self._getPageOfItems(skipCount - maxItems, maxItems, filters, sortCriterium, true);
+                        }
                     }
                 },
                 error: function (request, status, error) {
-                    listParms.totalItemsCount = self.settings.totalItemsCount;
+                    if (self.settings.usePaginator) {
+                        listParms.totalItemsCount = 0;
+                    }
                     self.settings.onEndLoadItems(true, listParms, request.responseText);
                 }
             });
@@ -129,12 +135,8 @@
             var defaults =
             {
                 listUrl: '/umbraco/surface/ItemsArchive/GetItems',
-                reqFilters: 0,
-                reqSortCriterium: 0,
-                displNrOfItemsElement: '#displNrOfItems',  // The hidden input element that is present in the HTML data that
-                                                           // is returned in the AJAX request to get list items.
-                                                           // The input element is expected to hold the number of items
-                                                           // returned in the list (displayed). 
+                reqFilters: null,
+                reqSortCriterium: null,
                 useHistory: false,  // When true all page requests are put in the browser history.
                 onBeginLoadItems: function () { },
                 onEndLoadItems: function (isError, listParms, responseText) { },
@@ -143,6 +145,10 @@
                 maxItems: 100,      // The maximum number of items that are allowed on a single page
                 reqSkipCount: 0,    // This number controls which page must become visible. The page is defined
                                     // by dividing this number by maxItems.
+                displNrOfItemsElement: '#displNrOfItems',  // The hidden input element that is present in the HTML data that
+                                                           // is returned in the AJAX request to get list items.
+                                                           // The input element is expected to hold the number of items
+                                                           // returned in the list (displayed). 
                 totalNrOfItemsElement: '#totalNrOfItems',  // The hidden input element that is present in the HTML data that
                                                            // is returned in the AJAX request to get a page of list items.
                                                            // The input element is expected to hold the (possibly modified) total number
@@ -210,20 +216,18 @@
         // Set list retrieval parameters
         // Arguments:
         // - argsArray: An array where the first element is an object with 3 fields:
-        //              maxItems, filters, and sortCriterium
+        //              maxItems, reqFilters, and reqSortCriterium
         setListParms: function (argsArray) {
             var args = argsArray[0];
             this.settings.maxItems = args.maxItems;
-            this.settings.reqFilters = args.filters;
-            this.settings.reqSortCriterium = args.sortCriterium;
+            this.settings.reqFilters = args.reqFilters;
+            this.settings.reqSortCriterium = args.reqSortCriterium;
         },
 
         // Get items
         // Arguments:
         // - argsArray: An array where the first element is an object with 2 fields:
         //              skipCount and initPaginator
-        // - argsArray: An array where the first element is an object with 5 fields:
-        //              skipCount, maxItems, filters, sortCriterium and initPaginator
         getItems: function (argsArray) {
             var args = argsArray[0];
             this._getPageOfItems(args.skipCount, this.settings.maxItems, this.settings.reqFilters, this.settings.reqSortCriterium, args.initPaginator);
