@@ -1,4 +1,4 @@
-###service.itemslist.jquery
+###service.itemslist.jquery - AJAX-enabled listviewer component
 
 ##Description
 
