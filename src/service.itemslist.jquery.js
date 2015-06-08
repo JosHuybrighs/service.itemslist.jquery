@@ -16,7 +16,8 @@
  *  - External methods:
  *      $('#items').itemslist('getItems', { skipCount: count, maxItems: count });
  *
- * version 1.0.0
+ * version 1.0.1: Error correction with 'history' handling
+ * version 1.0.0: Initial version
  *
  * @requires jQuery 1.8.0 or later
  *
@@ -30,6 +31,7 @@
 
 ;(function ($, win, document, undefined) {
 
+    var version = '1.0.1';
     var pluginName = 'itemslist';
 
     function Plugin(element, options) {
@@ -170,7 +172,7 @@
                         self.settings.reqFilters = state.data.filters;
                         // Check if we came here because of an internal event (user selects from the years dropdown box or
                         // user selects page through the paginator) or because the 'back' button was pressed/touched.
-                        var initPaginator = this.settings.usePaginator;
+                        var initPaginator = self.settings.usePaginator;
                         if (state.data.index >= 0) {
                             var currentIndex = History.getCurrentIndex();
                             var internal = (state.data.index == (currentIndex - 1));
